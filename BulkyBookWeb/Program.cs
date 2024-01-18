@@ -1,4 +1,6 @@
-using BulkyBookWeb.Data;
+using Bulky.DataAcess.Data;
+using Bulky.DataAcess.Repository;
+using Bulky.DataAcess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace BulkyBookWeb
@@ -14,6 +16,7 @@ namespace BulkyBookWeb
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")
                 ));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 
@@ -24,7 +27,7 @@ namespace BulkyBookWeb
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseMiddleware<TestMiddleware>();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -35,6 +38,7 @@ namespace BulkyBookWeb
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapGet("/test", () => "test" );
 
             app.Run();
         }
